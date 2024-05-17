@@ -49,7 +49,7 @@ extern "C" {
  *
  * @return A pointer to created \ref GodotInstance GDExtension object or nullptr if there was an error.
  */
-GDExtensionObjectPtr libgodot_create_godot_instance(int p_argc, char *p_argv[], GDExtensionInitializationFunction p_init_func);
+__declspec(dllexport) GDExtensionObjectPtr libgodot_create_godot_instance(int p_argc, char *p_argv[], GDExtensionInitializationFunction p_init_func, void *p_platform_data);
 
 /**
  * @name libgodot_destroy_godot_instance
@@ -60,7 +60,7 @@ GDExtensionObjectPtr libgodot_create_godot_instance(int p_argc, char *p_argv[], 
  * @param p_godot_instance The reference to the GodotInstance object to destroy.
  *
  */
-void libgodot_destroy_godot_instance(GDExtensionObjectPtr p_godot_instance);
+__declspec(dllexport) void libgodot_destroy_godot_instance(GDExtensionObjectPtr p_godot_instance);
 
 #ifdef __cplusplus
 }

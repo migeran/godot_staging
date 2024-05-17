@@ -1,5 +1,5 @@
 /**************************************************************************/
-/*  rendering_native_surface_windows.cpp                                  */
+/*  libgodot_windows.cpp                                                 */
 /**************************************************************************/
 /*                         This file is part of:                          */
 /*                             GODOT ENGINE                               */
@@ -28,50 +28,43 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#include "rendering_native_surface_windows.h"
+#include "core/extension/libgodot.h"
 
-#if defined(D3D12_ENABLED)
-#include "drivers/d3d12/rendering_context_driver_d3d12.h"
-#endif
+#include "core/extension/godot_instance.h"
+#include "main/main.h"
 
-#if defined(VULKAN_ENABLED)
-#include "platform/windows/rendering_context_driver_vulkan_windows.h"
-#endif
+#include "os_windows.h"
 
-void RenderingNativeSurfaceWindows::_bind_methods() {
-	ClassDB::bind_static_method("RenderingNativeSurfaceWindows", D_METHOD("create", "hwnd", "instance"), &RenderingNativeSurfaceWindows::create_api);
-}
+static OS_Windows *os = nullptr;
 
-Ref<RenderingNativeSurfaceWindows> RenderingNativeSurfaceWindows::create_api(GDExtensionConstPtr<const void> p_window, GDExtensionConstPtr<const void> p_instance) {
-	return RenderingNativeSurfaceWindows::create((HWND)p_window.operator const void *(), (HINSTANCE)p_instance.operator const void *());
-}
+static GodotInstance *instance = nullptr;
 
-Ref<RenderingNativeSurfaceWindows> RenderingNativeSurfaceWindows::create(HWND p_window, HINSTANCE p_instance) {
-	Ref<RenderingNativeSurfaceWindows> result = memnew(RenderingNativeSurfaceWindows);
-	result->window = p_window;
-	result->instance = p_instance;
-	return result;
-}
+GDExtensionObjectPtr libgodot_create_godot_instance(int p_argc, char *p_argv[], GDExtensionInitializationFunction p_init_func, void *p_platform_data) {
+	ERR_FAIL_COND_V_MSG(instance != nullptr, nullptr, "Only one Godot Instance may be created.");
 
-RenderingContextDriver *RenderingNativeSurfaceWindows::create_rendering_context() {
-	switch (driver_type) {
-#if defined(VULKAN_ENABLED)
-		case RenderingNativeSurfaceWindows::DriverType::Vulkan:
-			return memnew(RenderingContextDriverVulkanWindows);
-#endif
-#if defined(D3D12_ENABLED)
-		case RenderingNativeSurfaceWindows::DriverType::D3D12:
-			return memnew(RenderingContextDriverD3D12);
-#endif
-		default:
-			return nullptr;
+	os = new OS_Windows((HINSTANCE) p_platform_data);
+
+	Error err = Main::setup(p_argv[0], p_argc - 1, &p_argv[1], false);
+	if (err != OK) {
+		return nullptr;
 	}
+
+	instance = memnew(GodotInstance);
+	if (!instance->initialize(p_init_func)) {
+		memdelete(instance);
+		instance = nullptr;
+		return nullptr;
+	}
+
+	return (GDExtensionObjectPtr)instance;
 }
 
-RenderingNativeSurfaceWindows::RenderingNativeSurfaceWindows() {
-	// Does nothing.
-}
-
-RenderingNativeSurfaceWindows::~RenderingNativeSurfaceWindows() {
-	// Does nothing.
+void libgodot_destroy_godot_instance(GDExtensionObjectPtr p_godot_instance) {
+	GodotInstance *godot_instance = (GodotInstance *)p_godot_instance;
+	if (instance == godot_instance) {
+		godot_instance->stop();
+		memdelete(godot_instance);
+		instance = nullptr;
+		Main::cleanup();
+	}
 }

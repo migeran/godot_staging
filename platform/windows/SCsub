@@ -26,6 +26,10 @@ common_win = [
     "rendering_native_surface_windows.cpp",
 ]
 
+libgodot_files = [
+    "libgodot_windows.cpp",
+]
+
 if env.msvc:
     common_win += ["crash_handler_windows_seh.cpp"]
 else:
@@ -57,12 +61,12 @@ env.add_source_files(sources, common_win)
 sources += res_obj
 
 if env["library_type"] == "static_library":
-    prog = env.add_library("#bin/godot", sources, PROGSUFFIX=env["PROGSUFFIX"])
+    prog = env.add_library("#bin/godot", sources + libgodot_files)
     arrange_program_clean(prog)
 elif env["library_type"] == "shared_library":
-    prog = env.add_shared_library("#bin/godot", sources, PROGSUFFIX=env["PROGSUFFIX"])
+    prog = env.add_shared_library("#bin/godot", sources + libgodot_files)
     arrange_program_clean(prog)
-else:
+else: # building executable
     prog = env.add_program("#bin/godot", sources, PROGSUFFIX=env["PROGSUFFIX"])
     arrange_program_clean(prog)
 
