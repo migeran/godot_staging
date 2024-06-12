@@ -57,12 +57,12 @@ env.add_source_files(sources, common_win)
 sources += res_obj
 
 if env["library_type"] == "static_library":
-    prog = env.add_library("#bin/godot", sources, PROGSUFFIX=env["PROGSUFFIX"])
+    prog = env.add_library("#bin/libgodot", sources, PROGSUFFIX=env["PROGSUFFIX"])
     arrange_program_clean(prog)
 elif env["library_type"] == "shared_library":
-    prog = env.add_shared_library("#bin/godot", sources, PROGSUFFIX=env["PROGSUFFIX"])
+    prog = env.add_shared_library("#bin/libgodot", sources, PROGSUFFIX=env["PROGSUFFIX"])
     arrange_program_clean(prog)
-else:
+else: # building executable
     prog = env.add_program("#bin/godot", sources, PROGSUFFIX=env["PROGSUFFIX"])
     arrange_program_clean(prog)
 
@@ -154,7 +154,7 @@ if env["d3d12"]:
 if not os.getenv("VCINSTALLDIR"):
     if env["debug_symbols"]:
         env.AddPostAction(prog, env.Run(platform_windows_builders.make_debug_mingw))
-        if env["windows_subsystem"] == "gui":
+        if env["library_type"] == "executable" and env["windows_subsystem"] == "gui":
             env.AddPostAction(prog_wrap, env.Run(platform_windows_builders.make_debug_mingw))
 
 env.platform_sources += sources
