@@ -2920,7 +2920,8 @@ bool EditorFileSystem::_scan_extensions() {
 	for (int i = 0; i < loaded_extensions.size(); i++) {
 		if (!extensions.has(loaded_extensions[i])) {
 			// The extension may not have a .gdextension file.
-			if (!FileAccess::exists(loaded_extensions[i])) {
+			const Ref<GDExtension> extension = GDExtensionManager::get_singleton()->get_extension(loaded_extensions[i]);
+			if (!extension->get_loader()->is_library_existing()) {
 				extensions_removed.push_back(loaded_extensions[i]);
 			}
 		}

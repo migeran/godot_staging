@@ -74,6 +74,7 @@ public:
 	void close_library() override;
 	bool is_library_open() const override;
 	bool has_library_changed() const override;
+	bool is_library_existing() const override;
 
 	Error parse_gdextension_file(const String &p_path);
 };

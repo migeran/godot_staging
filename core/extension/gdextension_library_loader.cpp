@@ -268,6 +268,10 @@ bool GDExtensionLibraryLoader::has_library_changed() const {
 	return false;
 }
 
+bool GDExtensionLibraryLoader::is_library_existing() const {
+	return FileAccess::exists(resource_path);
+}
+
 Error GDExtensionLibraryLoader::parse_gdextension_file(const String &p_path) {
 	resource_path = p_path;
 
