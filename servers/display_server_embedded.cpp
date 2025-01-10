@@ -306,7 +306,7 @@ bool DisplayServerEmbedded::has_feature(Feature p_feature) const {
 		// case FEATURE_HIDPI:
 		// case FEATURE_ICON:
 		// case FEATURE_IME:
-		// case FEATURE_MOUSE:
+		case FEATURE_MOUSE:
 		// case FEATURE_MOUSE_WARP:
 		// case FEATURE_NATIVE_DIALOG:
 		// case FEATURE_NATIVE_ICON:
@@ -601,4 +601,21 @@ void DisplayServerEmbedded::gl_window_make_current(DisplayServer::WindowID p_win
 	}
 	current_window = p_window_id;
 #endif
+}
+
+void DisplayServerEmbedded::mouse_set_mode(DisplayServer::MouseMode p_mode) {
+
+}
+
+DisplayServer::MouseMode DisplayServerEmbedded::mouse_get_mode() const {
+return MOUSE_MODE_VISIBLE;
+}
+	
+Point2i DisplayServerEmbedded::mouse_get_position() const {
+	return Input::get_singleton()->get_mouse_position();
+}
+
+// This isn't really called (see Input.cpp) but it needs overriden
+BitField<MouseButtonMask> DisplayServerEmbedded::mouse_get_button_state() const {
+	return Input::get_singleton()->get_mouse_button_mask();
 }
